@@ -41,20 +41,6 @@ const handleOrientation = (event) => {
   neutralGamma = event.gamma;
 };
 async function enableMotion() {
-console.log("DeviceOrientationEvent:", window.DeviceOrientationEvent);
-console.log(
-"requestPermission:",
-window.DeviceOrientationEvent?.requestPermission
-);
-console.log(
-"secure:",
-window.isSecureContext
-);
-console.log(
-"userAgent:",
-navigator.userAgent
-);
-
   if (typeof DeviceOrientationEvent === "undefined") {
     alert("Device orientation not supported");
     return false;
@@ -71,6 +57,8 @@ navigator.userAgent
       if (permission !== "granted") {
         alert("Motion permission denied");
         return false;
+      } else {
+        isSupportGyro = true;
       }
     } catch (error) {
       alert("Motion permission error:", error);
