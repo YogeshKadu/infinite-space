@@ -40,6 +40,7 @@ const handleOrientation = (event) => {
   console.log(event.gamma);
   neutralGamma = event.gamma;
 };
+
 async function enableMotion() {
   if (typeof DeviceOrientationEvent === "undefined") {
     alert("Device orientation not supported");
@@ -51,32 +52,27 @@ async function enableMotion() {
     typeof DeviceOrientationEvent.requestPermission === "function"
   ) {
     try {
-      const permission =
-        await DeviceOrientationEvent.requestPermission();
-
+      const permission = await DeviceOrientationEvent.requestPermission();
       if (permission !== "granted") {
         alert("Motion permission denied");
         return false;
       } else {
+        // IMPORTANT: listener goes here
+        window.addEventListener(
+          "deviceorientation",
+          handleOrientation
+        );
         isSupportGyro = true;
+        console.log("Motion enabled");
       }
     } catch (error) {
       alert("Motion permission error:", error);
       return false;
     }
   }
-
-  // IMPORTANT: listener goes here
-  window.addEventListener(
-    "deviceorientation",
-    handleOrientation
-  );
-
-  isSupportGyro = true;
-  console.log("Motion enabled");
-
-  return true;
 }
+
+
 window.onload = async () => {
   enableMotion();
 }
