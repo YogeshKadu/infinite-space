@@ -40,47 +40,33 @@ const handleOrientation = (event) => {
   console.log(event.gamma);
   currentGamma = event.gamma;
 };
-async function enableMotion() {
-  // Check API
-  if (typeof DeviceOrientationEvent === "undefined") {
-    alert("Device orientation not supported");
-    return false;
-  }
-
-  // iOS requires explicit permission
-  if (
-    typeof DeviceOrientationEvent.requestPermission === "function"
-  ) {
+async function initializeGyroscope() {
+  // Check if the browser requires explicit permission (iOS 13+)
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
     try {
-      const permission =
-        await DeviceOrientationEvent.requestPermission();
-
-      if (permission !== "granted") {
-        alert("Motion permission denied");
-        return false;
+      const permissionState = await DeviceOrientationEvent.requestPermission();
+      if (permissionState === 'granted') {
+        window.addEventListener('deviceorientation', handleOrientation, true);
+      } else {
+        alert('Permission to access gyroscope was denied.');
       }
-
     } catch (error) {
-      console.error("Motion permission error:", error);
-      return false;
+      console.error('Error requesting gyroscope permission:', error);
+    }
+  } else {
+    // Android and older iOS devices do not require explicit permission
+    if ('deviceorientation' in window) {
+      window.addEventListener('deviceorientation', handleOrientation, true);
+    } else {
+      alert('Gyroscope/Device Orientation is not supported on this browser.');
     }
   }
-
-  // IMPORTANT:
-  // Add listener regardless of whether requestPermission existed
-  window.addEventListener(
-    "deviceorientation",
-    handleOrientation
-  );
-  isSupportGyro = true;
-  console.log("Motion enabled");
-  return true;
 }
+
 canvas.addEventListener("click", async() => {
-  const success = await enableMotion();
-  if (success) {
-    neutralGamma = currentGamma;
-  }
+  await initializeGyroscope();
+  neutralGamma = currentGamma;
+  console.log("neutralGamma - ", neutralGamma, currentGamma);
 });
 
 // 3. Listen for keyboard events
@@ -111,6 +97,7 @@ class Player {
       this.lerpPosition.x = lerp(this.lerpPosition.x, this.position.x, time);
     } else {
       const tilt = currentGamma - neutralGamma;
+      console.log(`tilt(${tilt}) = currentGamma(${currentGamma}) - neutralGamma(${neutralGamma})`);
       this.lerpPosition.x += tilt;
       // const time = 1 - Math.exp(-1 * delta);
       // this.lerpPosition.x = lerp(this.lerpPosition.x, this.position.x, time);
