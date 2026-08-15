@@ -38,7 +38,7 @@ let neutralGamma = 0;
 const keys = {};
 const handleOrientation = (event) => {
   console.log(event.gamma);
-  neutralGamma = event.gamma;
+  currentGamma = event.gamma;
 };
 async function enableMotion() {
   // Check API
@@ -78,6 +78,9 @@ async function enableMotion() {
 }
 canvas.addEventListener("click", async() => {
   const success = await enableMotion();
+  if (success) {
+    neutralGamma = currentGamma;
+  }
 });
 
 // 3. Listen for keyboard events
@@ -232,6 +235,5 @@ function physics(timestamp) {
 }
 
 addObstacles();
-
 animate();
 physics();
