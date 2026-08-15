@@ -40,42 +40,46 @@ const handleOrientation = (event) => {
   console.log(event.gamma);
   neutralGamma = event.gamma;
 };
-
 async function enableMotion() {
+  // Check API
   if (typeof DeviceOrientationEvent === "undefined") {
     alert("Device orientation not supported");
     return false;
   }
 
-  // Some browsers (notably iOS Safari) require permission
+  // iOS requires explicit permission
   if (
     typeof DeviceOrientationEvent.requestPermission === "function"
   ) {
     try {
-      const permission = await DeviceOrientationEvent.requestPermission();
+      const permission =
+        await DeviceOrientationEvent.requestPermission();
+
       if (permission !== "granted") {
         alert("Motion permission denied");
         return false;
-      } else {
-        // IMPORTANT: listener goes here
-        window.addEventListener(
-          "deviceorientation",
-          handleOrientation
-        );
-        isSupportGyro = true;
-        console.log("Motion enabled");
       }
+
     } catch (error) {
-      alert("Motion permission error:", error);
+      console.error("Motion permission error:", error);
       return false;
     }
   }
-}
 
-
-window.onload = async () => {
-  enableMotion();
+  // IMPORTANT:
+  // Add listener regardless of whether requestPermission existed
+  window.addEventListener(
+    "deviceorientation",
+    handleOrientation
+  );
+  isSupportGyro = true;
+  console.log("Motion enabled");
+  return true;
 }
+canvas.addEventListener("click", async() => {
+  const success = enableMotion();
+});
+
 // 3. Listen for keyboard events
 window.addEventListener("keydown", (e) => {
   keys[e.key] = true;
@@ -122,7 +126,6 @@ class Player {
     this.ctx.stroke();
   }
 }
-canvas.addEventListener("click",enableMotion);
 
 // |      |      |      |       0
 // |      |      |------|       1
