@@ -77,7 +77,7 @@ async function enableMotion() {
   return true;
 }
 canvas.addEventListener("click", async() => {
-  const success = enableMotion();
+  const success = await enableMotion();
 });
 
 // 3. Listen for keyboard events
