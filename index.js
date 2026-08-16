@@ -35,15 +35,15 @@ function ResusmeGame() {
 }
 function PauseGame() {
   pauseGame = true;
-  if(isGameOver)
+  if (isGameOver)
     resumeBTN.style.display = "none";
   gameMenu.style.display = "flex";
   gameMenu.style.display = "flex";
   clearInterval(CatchInterval);
 }
-function Quit() {}
+function Quit() { }
 function ToggleMenu() {
-  if(pauseGame) {
+  if (pauseGame) {
     ResusmeGame();
   } else {
     PauseGame();
@@ -131,33 +131,39 @@ class Player {
     this.ctx.arc(this.lerpPosition.x, this.lerpPosition.y, playerRadius, 0, Math.PI * 2);
     this.ctx.stroke();
   }
-  #checkCollusion(obstacle) {
+  #checkCollision(player, obstacle) {
     return (
-      this.position.x <= (obstacle.position.x + obstacleWidth) &&
-      (this.position.x + playerSize) >= obstacle.position.x &&
-      this.position.y <= (obstacle.position.y + playerSize) &&
-      (this.position.y + playerSize) > obstacle.position.y
-    )
+      player.position.x < obstacle.position.x + obstacleWidth &&
+      player.position.x + playerSize > obstacle.position.x &&
+      player.position.y < obstacle.position.y + playerSize &&
+      player.position.y + playerSize > obstacle.position.y
+    );
   }
   #handleCollusion(obstacle) {
     const { id, position } = obstacle;
+    const player = {
+      position: {
+        x: this.position.x - playerRadius,
+        y: this.position.y - playerRadius
+      }
+    }
     if ([3, 4, 5].includes(id)) {
       const _obstacle = { position: { y: position.y, x: 0 } }
-      if (this.#checkCollusion(_obstacle)) {
+      if (this.#checkCollision(player, _obstacle)) {
         console.log("[3, 4, 5]");
         return true;
       }
     }
     if ([2, 4, 6].includes(id)) {
       const _obstacle = { position: { y: position.y, x: obstacleWidth } }
-      if (this.#checkCollusion(_obstacle)) {
+      if (this.#checkCollision(player, _obstacle)) {
         console.log("[2, 4, 6]");
         return true;
       }
     }
     if ([1, 5, 6].includes(id)) {
       const _obstacle = { position: { y: position.y, x: obstacleWidth * 2 } }
-      if (this.#checkCollusion(_obstacle)) {
+      if (this.#checkCollision(player, _obstacle)) {
         console.log("[1, 5, 6]");
         return true;
       }
