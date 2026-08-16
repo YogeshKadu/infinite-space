@@ -37,30 +37,43 @@ let currentGamma = 0;
 let neutralGamma = 0;
 const keys = {};
 const handleOrientation = (event) => {
-  console.log(event.gamma);
-  currentGamma = event.gamma;
+    console.log("alpha:", event.alpha);
+    console.log("beta:", event.beta);
+    console.log("gamma:", event.gamma);
+
+    if (event.gamma !== null) {
+        currentGamma = event.gamma;
+    }
 };
 async function initializeGyroscope() {
-  // Check if the browser requires explicit permission (iOS 13+)
-  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-    try {
-      const permissionState = await DeviceOrientationEvent.requestPermission();
-      if (permissionState === 'granted') {
-        window.addEventListener('deviceorientation', handleOrientation, true);
-      } else {
-        alert('Permission to access gyroscope was denied.');
-      }
-    } catch (error) {
-      console.error('Error requesting gyroscope permission:', error);
+
+    console.log("DeviceOrientationEvent:", typeof DeviceOrientationEvent);
+    console.log("Secure:", window.isSecureContext);
+
+    if (typeof DeviceOrientationEvent === "undefined") {
+        alert("Device orientation API is not available.");
+        return;
     }
-  } else {
-    // Android and older iOS devices do not require explicit permission
-    if ('deviceorientation' in window) {
-      window.addEventListener('deviceorientation', handleOrientation, true);
-    } else {
-      alert('Gyroscope/Device Orientation is not supported on this browser.');
+
+    if (typeof DeviceOrientationEvent.requestPermission === "function") {
+
+        // iOS
+        const permission =
+            await DeviceOrientationEvent.requestPermission();
+
+        if (permission !== "granted") {
+            alert("Motion permission denied.");
+            return;
+        }
     }
-  }
+
+    window.addEventListener(
+        "deviceorientation",
+        handleOrientation,
+        true
+    );
+
+    console.log("Gyroscope listener attached");
 }
 
 canvas.addEventListener("click", async() => {
